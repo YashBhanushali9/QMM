@@ -1,0 +1,93 @@
+---
+title: "QMM Module 9"
+author: "Yash Bhanushali"
+date: "06/11/2022"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Based on the problem statement, the goal is to:
+
+Maximize Z = P - 6*C - 3*D
+
+  P = total (discounted) profit over the life of the new products,
+  C = change (in either direction) in the current level of employment,
+  D = decrease (if any) in next year’s earnings from the current year’s level.
+
+Subject to:
+
+Total Profit: Maximize P = 20*X1 + 15*X2 + 25*X3
+
+Employment Level: 6*X1 + 4*X2 + 5*X3 = 50
+
+Earnings Next Year: 8*X1 + 7*X2 + 5*X3 >= 75
+
+As a result, the auxillery variables become:
+
+Y1 = 6*X1 + 4*X2 + 5*X3 - 50
+Y2 = 8*X1 + 7*X2 + 5*X3 - 75
+
+Which becomes:
+
+(Y1P - Y1M) = 6*X1 + 4*X2 + 5*X3 - 50
+(Y2P - Y2M) = 8*X1 + 7*X2 + 5*X3 - 75
+
+Therefore, the final setup of the problem statement is:
+
+Maximize Z = 20*X1 + 15*X2 + 25*X3 - 6*Y1P - 6*Y1M - 3*Y2M
+
+Subject to:
+
+6*X1 + 4*X2 + 5*X3 - (Y1P - Y1M) = 50
+8*X1 + 7*X2 + 5*X3 - (Y2P - Y2M) = 75
+
+And:
+
+X1, X2, X3 >= 0
+Y1P, Y1M, Y2P, Y2M >= 0
+
+Lastly, we will run this problem in R as a linear programming model and discuss the results.
+
+```{r}
+# This problem will require the "lpSolveAPI" library
+require(lpSolveAPI)
+```
+
+
+```{r}
+#Set Working Directory
+getwd()
+setwd("D:/MSBA/QMM/Assignment module 9")
+
+```
+
+```{r}
+# Import the .lp file for this problem
+lpm <- read.lp(filename = "emax.lp", type = "lp")
+# Return the linear programming model
+lpm
+```
+
+```{r}
+# Solve the linear programming model
+solve(lpm)
+get.objective(lpm)
+get.variables(lpm)
+```
+
+Based on the output of the linear programming model, we can conclude several things.
+
+X1 = 0
+X2 = 0
+X3 = 15
+Y1P = 25
+Y1M = 0
+Y2M = 0
+Y2P = 0
+
+This leads us to the conclusion that only product 3 should be included in the product mix. A 225 unit object value would result from this combination. The employment level goal will be exceeded by 25 units, which translates to 2,500 employees and a penalty of 150 units to the objective function, while the profits goal for the upcoming year is fully satisfied.
